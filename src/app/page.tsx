@@ -48,31 +48,31 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="md:w-1/2 md:mx-auto mx-4 my-4 md:my-8 font-light">
-      <div className="flex items-center gap-2">
+    <div className="md:w-1/2 md:mx-auto mx-4 mb-4 md:mb-8 md:mt-4 font-light">
+      <div className="flex items-center gap-2 py-4 bg-white sticky top-0">
         <div className="flex items-center gap-2 w-full">
           <input
             value={english}
             onChange={(e) => setEnglish(e.target.value)}
             placeholder="English"
-            className="h-10 px-4 py-2 rounded-lg bg-zinc-50 border border-zinc-200 w-1/2"
+            className="h-10 px-4 py-2 rounded-lg bg-zinc-50 border border-zinc-200 w-1/2 placeholder:text-zinc-400 outline-none duration-200 focus:ring-2 ring-offset-2"
           />
           <input
             value={meaning}
             onChange={(e) => setMeaning(e.target.value)}
             placeholder="Meaning"
-            className="h-10 px-4 py-2 rounded-lg bg-zinc-50 border border-zinc-200 w-1/2"
+            className="h-10 px-4 py-2 rounded-lg bg-zinc-50 border border-zinc-200 w-1/2 placeholder:text-zinc-400 outline-none duration-200 focus:ring-2 ring-offset-2"
           />
         </div>
         <button
           onClick={saveMemo}
-          className="px-4 py-2 rounded-full bg-zinc-800 text-white w-fit"
+          className="px-4 py-2 rounded-full bg-zinc-800 text-white w-fit outline-none duration-200 focus:ring-2 ring-offset-2"
         >
           Save
         </button>
       </div>
 
-      <div className="bg-zinc-50 p-4 rounded-lg mt-8">
+      <div className="bg-zinc-50 p-4 rounded-lg mt-4">
         <h1 className="text-xl">Archived</h1>
         <div className="border-t mt-2 mb-4 border-zinc-200" />
 
