@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react";
 import db from "@/lib/firebaseConfig";
-import { collection, addDoc, getDocs, updateDoc, doc } from "firebase/firestore";
+import { collection, addDoc, getDocs, updateDoc, doc, deleteDoc } from "firebase/firestore";
 
 interface Memo {
   id: string;  // Added ID to identify documents uniquely
@@ -31,6 +31,19 @@ export default function Home() {
       console.error("Error saving memo:", error);
     }
   };
+
+  const deleteMemo = async () => {
+    if (editingMemo) {
+      try {
+        const memoRef = doc(db, "english_memos", editingMemo.id);
+        await deleteDoc(memoRef);  // Delete the document
+        setEditingMemo(null);  // Close the modal after deletion
+        fetchMemos();  // Refresh the list after deletion
+      } catch (error) {
+        console.error("Error deleting memo:", error);
+      }
+    }
+  };  
 
   const fetchMemos = async () => {
     try {
@@ -116,7 +129,10 @@ export default function Home() {
       {editingMemo && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center backdrop-blur">
           <div className="bg-white p-6 rounded-lg w-3/4 md:w-1/4 flex flex-col">
-            <h2 className="text-xl mb-4">Edit Memo</h2>
+            <div className="flex items-center mb-4">
+              <h2 className="text-xl mr-2">Edit Memo</h2>
+              <button className="ml-auto text-red-600 bg-red-50 px-2 py-0.5 rounded-lg" onClick={deleteMemo}>Delete</button>
+            </div>
             <div className="mb-4">
               <input
                 value={editingMemo.english}
