@@ -1,9 +1,10 @@
 "use client"
 import { useState, useEffect } from "react";
 import db from "@/lib/firebaseConfig";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, updateDoc, doc } from "firebase/firestore";
 
 interface Memo {
+  id: string;  // Added ID to identify documents uniquely
   english: string;
   meaning: string;
 }
@@ -11,8 +12,9 @@ interface Memo {
 export default function Home() {
   const [english, setEnglish] = useState<string>("");
   const [meaning, setMeaning] = useState<string>("");
-  
+
   const [archives, setArchives] = useState<Memo[]>([]);
+  const [editingMemo, setEditingMemo] = useState<Memo | null>(null);  // New state for selected memo to edit
 
   const saveMemo = async () => {
     try {
@@ -35,11 +37,27 @@ export default function Home() {
       const querySnapshot = await getDocs(collection(db, "english_memos"));
       const fetchedMemos: Memo[] = [];
       querySnapshot.forEach((doc) => {
-        fetchedMemos.push(doc.data() as Memo);
+        fetchedMemos.push({ id: doc.id, ...doc.data() } as Memo);
       });
       setArchives(fetchedMemos);
     } catch (error) {
       console.error("Error fetching memos:", error);
+    }
+  };
+
+  const updateMemo = async () => {
+    if (editingMemo && editingMemo.english && editingMemo.meaning) {
+      try {
+        const memoRef = doc(db, "english_memos", editingMemo.id);
+        await updateDoc(memoRef, {
+          english: editingMemo.english,
+          meaning: editingMemo.meaning,
+        });
+        setEditingMemo(null);  // Close modal after updating
+        fetchMemos();  // Refresh the list
+      } catch (error) {
+        console.error("Error updating memo:", error);
+      }
     }
   };
 
@@ -78,17 +96,64 @@ export default function Home() {
 
         <div className="space-y-4">
           {archives.length > 0 ? (
-            archives.map((memo, index) => (
-              <div key={index}>
+            archives.map((memo) => (
+              <div
+                key={memo.id}
+                className="hover:bg-zinc-200 cursor-pointer"
+                onClick={() => setEditingMemo(memo)}  // Trigger editing on click
+              >
                 <p>{memo.english}</p>
                 <p className="text-zinc-400 text-sm mt-0.5">{memo.meaning}</p>
               </div>
             ))
           ) : (
-            <p>No archived memos yet.</p>
+            <p className="text-center text-zinc-400">No archived memos yet.</p>
           )}
         </div>
       </div>
+
+      {/* Edit Memo Modal */}
+      {editingMemo && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center backdrop-blur">
+          <div className="bg-white p-6 rounded-lg mx-4 md:w-1/4 flex flex-col">
+            <h2 className="text-xl mb-4">Edit Memo</h2>
+            <div className="mb-4">
+              <input
+                value={editingMemo.english}
+                onChange={(e) =>
+                  setEditingMemo({ ...editingMemo, english: e.target.value })
+                }
+                placeholder="English"
+                className="h-10 px-4 py-2 rounded-lg bg-zinc-50 border border-zinc-200 w-full placeholder:text-zinc-400 outline-none duration-200 focus:ring-2 ring-offset-2"
+              />
+            </div>
+            <div className="mb-4">
+              <input
+                value={editingMemo.meaning}
+                onChange={(e) =>
+                  setEditingMemo({ ...editingMemo, meaning: e.target.value })
+                }
+                placeholder="Meaning"
+                className="h-10 px-4 py-2 rounded-lg bg-zinc-50 border border-zinc-200 w-full placeholder:text-zinc-400 outline-none duration-200 focus:ring-2 ring-offset-2"
+              />
+            </div>
+            <div className="flex gap-2 ml-auto">
+              <button
+                onClick={() => setEditingMemo(null)}  // Close modal without saving
+                className="px-4 py-2 rounded-full bg-zinc-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={updateMemo}
+                className="px-4 py-2 rounded-full bg-zinc-800 text-white"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
