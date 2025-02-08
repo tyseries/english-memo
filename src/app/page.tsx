@@ -66,7 +66,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="md:w-1/2 md:mx-auto mx-4 mb-4 md:mb-8 md:mt-4 font-light">
+    <div className="md:w-1/2 md:mx-auto mx-4 mb-4 font-light">
       <div className="flex items-center gap-2 py-4 bg-white sticky top-0">
         <div className="flex items-center gap-2 w-full">
           <input
@@ -115,7 +115,7 @@ export default function Home() {
       {/* Edit Memo Modal */}
       {editingMemo && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center backdrop-blur">
-          <div className="bg-white p-6 rounded-lg mx-4 md:w-1/4 flex flex-col">
+          <div className="bg-white p-6 rounded-lg w-3/4 md:w-1/4 flex flex-col">
             <h2 className="text-xl mb-4">Edit Memo</h2>
             <div className="mb-4">
               <input
